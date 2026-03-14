@@ -5,7 +5,7 @@ import { PageHero } from "@/components/layout/page-hero";
 
 export const metadata = buildMetadata({
   title: "About",
-  description: "The story behind YISOS CIGARS and the ritual-first philosophy.",
+  description: "Meet Jesus Soto and the veteran-owned lounge culture behind YISOS CIGARS in Killeen, Texas.",
   path: "/about"
 });
 
@@ -14,26 +14,46 @@ export default function AboutPage() {
     <>
       <PageHero
         eyebrow="Legacy"
-        title="A Premium Ritual House"
-        description="YISOS CIGARS exists to turn every smoke into a deliberate moment of style, calm, and identity."
+        title="Veteran-Owned. Lounge-Built."
+        description="YISOS CIGARS is rooted in service, brotherhood, and the kind of cigar lounge culture that keeps people coming back for one more hour."
       />
       <section className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-16 lg:grid-cols-[1fr,1fr] lg:px-8">
         <div className="space-y-5 text-muted-foreground">
           <VeteranOwnedBadge compact />
           <p>
-            Built from lounge culture and modern discipline, YISOS combines old-world cigar tradition with luxury-grade digital experience.
+            YISOS CIGARS is owned by Jesus Soto, a retired U.S. Army veteran who made Killeen, Texas home after completing 20 years of service.
           </p>
           <p>
-            We source from respected growing regions, test each profile for consistency, and release only blends that hold character from first third to final inch.
+            The brand is built around the same values that shape a great lounge: discipline, hospitality, conversation, and the ritual of slowing down long enough to enjoy a proper cigar.
           </p>
           <p>
-            Every product page, package, and post-purchase touchpoint is designed to feel intentional, masculine, and unmistakably premium.
+            Inside the lounge, guests can settle in for a game of dominoes or poker, catch the fight or their favorite team on TV, or simply relax with a favorite cigar and beverage. It is BYOB, built for unwinding, and meant to feel familiar from the moment you walk in.
+          </p>
+          <p>
+            Personal lockers are also available for rent, giving regulars a secure place to store their sticks and essentials until the next visit. That is the culture behind YISOS: repeatable, personal, and rooted in real lounge life.
+          </p>
+          <div className="grid gap-4 pt-4 sm:grid-cols-3">
+            <div className="rounded-xl border border-border bg-yisos-charcoal/60 p-4">
+              <p className="text-xs uppercase tracking-[0.18em] text-yisos-gold">Owner</p>
+              <p className="mt-2 font-display text-2xl text-yisos-bone">Jesus Soto</p>
+            </div>
+            <div className="rounded-xl border border-border bg-yisos-charcoal/60 p-4">
+              <p className="text-xs uppercase tracking-[0.18em] text-yisos-gold">Home Base</p>
+              <p className="mt-2 font-display text-2xl text-yisos-bone">Killeen, Texas</p>
+            </div>
+            <div className="rounded-xl border border-border bg-yisos-charcoal/60 p-4">
+              <p className="text-xs uppercase tracking-[0.18em] text-yisos-gold">Lounge Perks</p>
+              <p className="mt-2 font-display text-2xl text-yisos-bone">BYOB + Lockers</p>
+            </div>
+          </div>
+          <p className="text-sm leading-relaxed text-yisos-bone/70">
+            If you want the exact owner portrait shown in the reference image on this page, place it in `public/about-owner.jpg` and it can replace the current lounge visual directly.
           </p>
         </div>
         <div className="relative h-[420px] overflow-hidden rounded-2xl border border-border">
           <Image
-            src="https://images.unsplash.com/photo-1511882150382-421056c89033?auto=format&fit=crop&w=1500&q=80"
-            alt="YISOS lounge"
+            src="/lifestyle-lounge.jpg"
+            alt="YISOS lounge culture"
             fill
             className="object-cover"
           />
