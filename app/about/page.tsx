@@ -46,9 +46,6 @@ export default function AboutPage() {
               <p className="mt-2 font-display text-2xl text-yisos-bone">BYOB + Lockers</p>
             </div>
           </div>
-          <p className="text-sm leading-relaxed text-yisos-bone/70">
-            If you want the exact owner portrait shown in the reference image on this page, place it in `public/about-owner.jpg` and it can replace the current lounge visual directly.
-          </p>
         </div>
         <div className="relative h-[420px] overflow-hidden rounded-2xl border border-border">
           <Image
