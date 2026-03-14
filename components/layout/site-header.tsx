@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, Shield, ShoppingBag, User2 } from "lucide-react";
@@ -13,6 +14,11 @@ import { BrandLogo } from "@/components/layout/brand-logo";
 export function SiteHeader({ isAdmin = false }: { isAdmin?: boolean }) {
   const pathname = usePathname();
   const { count, setCartOpen } = useCart();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/70 bg-yisos-black/90 backdrop-blur-lg">
@@ -63,7 +69,7 @@ export function SiteHeader({ isAdmin = false }: { isAdmin?: boolean }) {
               <span className="ml-2 rounded-full bg-yisos-gold px-2 py-0.5 text-xs text-yisos-black">{count}</span>
             ) : null}
           </Button>
-          <Sheet>
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />
@@ -72,15 +78,24 @@ export function SiteHeader({ isAdmin = false }: { isAdmin?: boolean }) {
             <SheetContent>
               <div className="mt-10 flex flex-col gap-4">
                 {mainNav.map((item) => (
-                  <Link key={item.href} href={item.href} className="border-b border-border pb-3 font-display text-xl">
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMenuOpen(false)}
+                    className="border-b border-border pb-3 font-display text-xl"
+                  >
                     {item.label}
                   </Link>
                 ))}
-                <Link href="/account" className="border-b border-border pb-3 font-display text-xl">
+                <Link
+                  href="/account"
+                  onClick={() => setMenuOpen(false)}
+                  className="border-b border-border pb-3 font-display text-xl"
+                >
                   Account
                 </Link>
                 {isAdmin ? (
-                  <Link href="/admin" className="font-display text-xl">
+                  <Link href="/admin" onClick={() => setMenuOpen(false)} className="font-display text-xl">
                     Admin
                   </Link>
                 ) : null}

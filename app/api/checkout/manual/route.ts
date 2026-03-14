@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getCurrentUser } from "@/lib/services/auth-service";
+import { getShippingQuote, type CheckoutShippingAddress } from "@/lib/services/usps-service";
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as {
@@ -8,9 +9,10 @@ export async function POST(request: Request) {
     email?: string;
     total?: number;
     paymentMethod?: string;
+    shipping?: CheckoutShippingAddress;
   } | null;
 
-  if (!body?.items?.length || !body?.total) {
+  if (!body?.items?.length) {
     return NextResponse.json({ message: "Invalid order payload" }, { status: 400 });
   }
 
@@ -22,6 +24,21 @@ export async function POST(request: Request) {
   }
 
   const orderNumber = `YIS-M-${Date.now().toString().slice(-8)}`;
+  const subtotal = body.items.reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0);
+  const shippingQuote = body.shipping
+    ? await getShippingQuote({
+        items: body.items.map((item) => ({
+          ...item,
+          slug: item.productId,
+          image: "",
+          stock: 999
+        })),
+        subtotal,
+        address: body.shipping
+      }).catch(() => null)
+    : null;
+  const shipping = Number(shippingQuote?.shippingAmount || 0) + Number(shippingQuote?.handlingAmount || 0);
+  const total = Number((subtotal + shipping).toFixed(2));
 
   const { data: order, error } = await supabase
     .from("orders")
@@ -30,13 +47,17 @@ export async function POST(request: Request) {
       order_number: orderNumber,
       payment_status: "pending",
       fulfillment_status: "pending_review",
-      subtotal: Number(body.total),
+      subtotal,
       tax: 0,
-      shipping: 0,
-      total: Number(body.total),
+      shipping,
+      total,
       currency: "USD",
       customer_email: body.email || null,
-      payment_method: body.paymentMethod || "manual"
+      payment_method: body.paymentMethod || "manual",
+      shipping_address: body.shipping || null,
+      notes: shippingQuote
+        ? `Carrier: ${shippingQuote.carrier}; Service: ${shippingQuote.serviceName}; Handling: ${shippingQuote.handlingAmount}`
+        : null
     })
     .select("id")
     .single();

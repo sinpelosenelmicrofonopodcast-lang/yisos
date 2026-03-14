@@ -55,6 +55,7 @@ A premium, cinematic, full-stack Next.js 15 commerce flagship for a luxury cigar
 - `POST /api/newsletter`
 - `POST /api/push-subscriptions`
 - `POST /api/promo-codes/apply`
+- `POST /api/shipping/quote`
 - `POST /api/cart-sessions`
 - `POST /api/favorites/sync`
 - `POST /api/checkout/manual`
@@ -121,6 +122,25 @@ A premium, cinematic, full-stack Next.js 15 commerce flagship for a luxury cigar
 2. Configure webhook to `POST /api/stripe/webhook`.
 3. Enable wallets/payment methods in Stripe Dashboard (card, Apple Pay, Google Pay, PayPal where available).
 4. Set `NEXT_PUBLIC_SITE_URL` to your production domain.
+
+## USPS Shipping Setup
+1. Add USPS API credentials to env:
+   - `USPS_CLIENT_ID`
+   - `USPS_CLIENT_SECRET`
+   - `USPS_ORIGIN_ZIP`
+   - `USPS_ACCOUNT_TYPE`
+   - `USPS_ACCOUNT_NUMBER`
+2. Optional package defaults:
+   - `USPS_DEFAULT_ITEM_WEIGHT_OZ`
+   - `USPS_PACKAGING_WEIGHT_OZ`
+   - `USPS_PACKAGE_LENGTH_IN`
+   - `USPS_PACKAGE_WIDTH_IN`
+   - `USPS_PACKAGE_HEIGHT_IN`
+   - `USPS_PACKAGE_HEIGHT_PER_ITEM_IN`
+   - `USPS_HANDLING_FEE`
+   - `FREE_SHIPPING_THRESHOLD`
+3. Checkout will validate US addresses with `Addresses 3.0` and quote rates with `Prices 3.0`.
+4. The app currently uses package defaults plus cart quantity for USPS rating. If you need per-product shipping precision, add weight/dimension fields to the catalog next.
 
 ## OneSignal Setup
 1. Add OneSignal app keys to env.

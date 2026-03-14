@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     .select("id", { count: "exact", head: true })
     .eq("product_id", productId);
 
-  const uploadedUrls: string[] = [];
+  const uploadedImages: { id: string; url: string; alt: string; sortOrder: number }[] = [];
   let sortOrder = existingImageCount || 0;
 
   for (const file of uploadFiles) {
@@ -51,20 +51,42 @@ export async function POST(request: Request) {
       data: { publicUrl }
     } = admin.supabase.storage.from("product-images").getPublicUrl(path);
 
-    const { error: imageInsertError } = await admin.supabase.from("product_images").insert({
-      product_id: productId,
-      image_url: publicUrl,
-      alt_text: `Product image ${productId}`,
-      sort_order: sortOrder
-    });
+    const altText = `Product image ${productId}`;
+    const { data: insertedImageRow, error: imageInsertError } = await admin.supabase
+      .from("product_images")
+      .insert({
+        product_id: productId,
+        image_url: publicUrl,
+        alt_text: altText,
+        sort_order: sortOrder
+      })
+      .select("id, image_url, alt_text, sort_order")
+      .single();
 
     if (imageInsertError) {
       return NextResponse.json({ message: imageInsertError.message }, { status: 400 });
     }
 
-    uploadedUrls.push(publicUrl);
+    const insertedImage = insertedImageRow as {
+      id: string;
+      image_url: string;
+      alt_text: string | null;
+      sort_order: number | null;
+    };
+
+    uploadedImages.push({
+      id: insertedImage.id,
+      url: insertedImage.image_url,
+      alt: insertedImage.alt_text || altText,
+      sortOrder: insertedImage.sort_order || sortOrder
+    });
     sortOrder += 1;
   }
 
-  return NextResponse.json({ success: true, urls: uploadedUrls, count: uploadedUrls.length });
+  return NextResponse.json({
+    success: true,
+    urls: uploadedImages.map((image) => image.url),
+    images: uploadedImages,
+    count: uploadedImages.length
+  });
 }

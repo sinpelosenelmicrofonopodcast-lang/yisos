@@ -14,6 +14,13 @@ interface ProductCategoryRelation {
   categories?: CategoryRelation | CategoryRelation[] | null;
 }
 
+interface ProductImageRelation {
+  id?: string | null;
+  image_url?: string | null;
+  alt_text?: string | null;
+  sort_order?: number | null;
+}
+
 interface AdminProductRow {
   id: string;
   name: string;
@@ -25,6 +32,7 @@ interface AdminProductRow {
   created_at: string;
   inventory?: InventoryRelation | InventoryRelation[] | null;
   product_categories?: ProductCategoryRelation[] | null;
+  product_images?: ProductImageRelation[] | null;
 }
 
 interface AdminCategoryRow {
@@ -44,7 +52,7 @@ export async function getAdminProducts() {
   const { data } = await supabase
     .from("products")
     .select(
-      "id, name, slug, sku, description, price, is_active, created_at, inventory(stock), product_categories(categories(id, slug, name))"
+      "id, name, slug, sku, description, price, is_active, created_at, inventory(stock), product_categories(categories(id, slug, name)), product_images(id, image_url, alt_text, sort_order)"
     )
     .order("created_at", { ascending: false })
     .limit(100);
@@ -64,7 +72,17 @@ export async function getAdminProducts() {
           ?.map((relation) =>
             Array.isArray(relation.categories) ? relation.categories[0]?.name : relation.categories?.name
           )
-          .filter((value): value is string => typeof value === "string" && value.length > 0) || []
+          .filter((value): value is string => typeof value === "string" && value.length > 0) || [],
+      images:
+        row.product_images
+          ?.map((image) => ({
+            id: image.id || "",
+            url: image.image_url || "",
+            alt: image.alt_text || "",
+            sortOrder: image.sort_order || 0
+          }))
+          .filter((image) => image.id && image.url)
+          .sort((a, b) => a.sortOrder - b.sortOrder) || []
     })) || []
   );
 }

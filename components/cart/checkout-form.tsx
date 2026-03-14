@@ -1,13 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
-import { ShieldCheck, Wallet } from "lucide-react";
+import { LoaderCircle, ShieldCheck, Wallet } from "lucide-react";
 import { useCart } from "@/components/cart/cart-provider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
+import type { ShippingQuote } from "@/lib/services/usps-service";
 
 const stripePromise =
   typeof window !== "undefined" && process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -19,14 +20,93 @@ export function CheckoutForm() {
   const [email, setEmail] = useState("");
   const [shippingName, setShippingName] = useState("");
   const [shippingAddress1, setShippingAddress1] = useState("");
+  const [shippingAddress2, setShippingAddress2] = useState("");
   const [shippingCity, setShippingCity] = useState("");
   const [shippingState, setShippingState] = useState("");
   const [shippingPostalCode, setShippingPostalCode] = useState("");
   const [shippingCountry, setShippingCountry] = useState("US");
   const [paymentMethod, setPaymentMethod] = useState<"stripe" | "paypal" | "manual">("stripe");
   const [status, setStatus] = useState<string | null>(null);
+  const [quote, setQuote] = useState<ShippingQuote | null>(null);
+  const [quoteLoading, setQuoteLoading] = useState(false);
 
   const isEmpty = useMemo(() => items.length === 0, [items]);
+  const discountedSubtotal = useMemo(() => Math.max(summary.subtotal - summary.discount, 0), [summary.discount, summary.subtotal]);
+  const quoteReady =
+    shippingAddress1.trim().length >= 4 &&
+    shippingCity.trim().length >= 2 &&
+    shippingState.trim().length >= 2 &&
+    shippingPostalCode.trim().length >= 4 &&
+    shippingCountry.trim().toUpperCase() === "US" &&
+    !isEmpty;
+  const shippingTotal = quote?.shippingAmount ?? summary.shipping;
+  const handlingTotal = quote?.handlingAmount ?? 0;
+  const estimatedTotalBeforeTax = discountedSubtotal + shippingTotal + handlingTotal;
+
+  const requestQuote = useCallback(async () => {
+    if (!quoteReady) {
+      setQuote(null);
+      return null;
+    }
+
+    setQuoteLoading(true);
+
+    try {
+      const response = await fetch("/api/shipping/quote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items,
+          subtotal: discountedSubtotal,
+          shipping: {
+            shippingName,
+            shippingAddress1,
+            shippingAddress2,
+            shippingCity,
+            shippingState,
+            shippingPostalCode,
+            shippingCountry
+          }
+        })
+      });
+
+      const data = (await response.json().catch(() => null)) as ShippingQuote | { message?: string } | null;
+
+      if (!response.ok || !data || !("carrier" in data)) {
+        setQuote(null);
+        setStatus((data && "message" in data && data.message) || "Unable to calculate USPS shipping.");
+        return null;
+      }
+
+      setQuote(data);
+      return data;
+    } finally {
+      setQuoteLoading(false);
+    }
+  }, [
+    discountedSubtotal,
+    items,
+    quoteReady,
+    shippingAddress1,
+    shippingAddress2,
+    shippingCity,
+    shippingCountry,
+    shippingName,
+    shippingPostalCode,
+    shippingState
+  ]);
+
+  useEffect(() => {
+    if (!quoteReady) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      void requestQuote();
+    }, 500);
+
+    return () => window.clearTimeout(timeout);
+  }, [quoteReady, requestQuote]);
 
   const startCheckout = async () => {
     if (isEmpty) {
@@ -34,7 +114,18 @@ export function CheckoutForm() {
       return;
     }
 
+    if (!quoteReady) {
+      setStatus("Complete a full US shipping address to calculate USPS shipping before checkout.");
+      return;
+    }
+
     setStatus("Preparing checkout...");
+    const activeQuote = await requestQuote();
+
+    if (quoteReady && !activeQuote) {
+      setStatus("USPS shipping could not be calculated for this address.");
+      return;
+    }
 
     if (paymentMethod === "manual") {
       const response = await fetch("/api/checkout/manual", {
@@ -49,7 +140,16 @@ export function CheckoutForm() {
             price: item.price,
             name: item.name
           })),
-          paymentMethod: "manual"
+          paymentMethod: "manual",
+          shipping: {
+            shippingName,
+            shippingAddress1,
+            shippingAddress2,
+            shippingCity,
+            shippingState,
+            shippingPostalCode,
+            shippingCountry
+          }
         })
       });
 
@@ -73,6 +173,7 @@ export function CheckoutForm() {
         shipping: {
           shippingName,
           shippingAddress1,
+          shippingAddress2,
           shippingCity,
           shippingState,
           shippingPostalCode,
@@ -129,6 +230,15 @@ export function CheckoutForm() {
               onChange={(event) => setShippingAddress1(event.target.value)}
             />
           </div>
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="address2">Address 2</Label>
+            <Input
+              id="address2"
+              value={shippingAddress2}
+              onChange={(event) => setShippingAddress2(event.target.value)}
+              placeholder="Apartment, suite, unit, building"
+            />
+          </div>
           <div className="space-y-2">
             <Label htmlFor="city">City</Label>
             <Input id="city" value={shippingCity} onChange={(event) => setShippingCity(event.target.value)} />
@@ -183,10 +293,20 @@ export function CheckoutForm() {
           </label>
         </div>
 
-        <Button variant="luxury" size="lg" className="w-full" onClick={startCheckout} disabled={isEmpty}>
+        <Button variant="luxury" size="lg" className="w-full" onClick={startCheckout} disabled={isEmpty || quoteLoading}>
           <Wallet className="mr-2 h-4 w-4" /> Complete Checkout
         </Button>
         {status ? <p className="text-sm text-muted-foreground">{status}</p> : null}
+        {quote?.warnings?.length ? (
+          <div className="rounded-lg border border-border/70 bg-black/20 p-4 text-sm text-muted-foreground">
+            <p className="font-medium text-yisos-bone">USPS address notes</p>
+            <ul className="mt-2 space-y-1">
+              {quote.warnings.map((warning) => (
+                <li key={warning}>- {warning}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
       </section>
 
       <aside className="h-fit rounded-xl border border-border bg-yisos-charcoal/70 p-6 lg:sticky lg:top-28">
@@ -196,18 +316,54 @@ export function CheckoutForm() {
             <span>Subtotal</span>
             <span>{formatCurrency(summary.subtotal)}</span>
           </div>
+          {summary.discount > 0 ? (
+            <div className="flex justify-between text-muted-foreground">
+              <span>Discount</span>
+              <span>-{formatCurrency(summary.discount)}</span>
+            </div>
+          ) : null}
           <div className="flex justify-between text-muted-foreground">
-            <span>Shipping</span>
-            <span>{summary.shipping ? formatCurrency(summary.shipping) : "Free"}</span>
+            <span>USPS Shipping</span>
+            <span>
+              {quoteLoading ? (
+                <span className="inline-flex items-center gap-2">
+                  <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+                  Calculating
+                </span>
+              ) : shippingTotal ? (
+                formatCurrency(shippingTotal)
+              ) : (
+                "Free"
+              )}
+            </span>
           </div>
           <div className="flex justify-between text-muted-foreground">
-            <span>Tax</span>
-            <span>{formatCurrency(summary.tax)}</span>
+            <span>Handling</span>
+            <span>{handlingTotal ? formatCurrency(handlingTotal) : "Included"}</span>
           </div>
           <div className="flex justify-between text-lg font-semibold text-yisos-bone">
-            <span>Total</span>
-            <span>{formatCurrency(summary.total)}</span>
+            <span>Estimated Total</span>
+            <span>{formatCurrency(estimatedTotalBeforeTax)}</span>
           </div>
+        </div>
+
+        <div className="mt-4 rounded-lg border border-border/70 bg-black/20 p-4 text-sm text-muted-foreground">
+          {quote ? (
+            <>
+              <p className="font-medium text-yisos-bone">{quote.serviceName}</p>
+              <p className="mt-1">
+                USPS validated to {quote.addressValidation?.address?.city}, {quote.addressValidation?.address?.state}{" "}
+                {quote.addressValidation?.address?.ZIPCode}
+                {quote.addressValidation?.address?.ZIPPlus4 ? `-${quote.addressValidation.address.ZIPPlus4}` : ""}
+              </p>
+              {quote.freeShippingApplied ? (
+                <p className="mt-2 text-yisos-gold">Free shipping threshold applied. Only handling is being charged.</p>
+              ) : null}
+            </>
+          ) : (
+            <p>Enter a complete US shipping address to calculate live USPS shipping and handling.</p>
+          )}
+          <p className="mt-2">Tax is finalized securely during payment confirmation.</p>
         </div>
 
         <p className="mt-5 inline-flex items-center gap-2 text-xs text-muted-foreground">

@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { PencilLine, Plus, RefreshCw } from "lucide-react";
+import Image from "next/image";
+import { PencilLine, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,12 @@ interface AdminProduct {
   is_active: boolean;
   categoryIds: string[];
   categoryNames: string[];
+  images: {
+    id: string;
+    url: string;
+    alt: string;
+    sortOrder: number;
+  }[];
 }
 
 function slugify(value: string) {
@@ -72,6 +79,7 @@ export function ProductManager({
   const [statusTone, setStatusTone] = useState<"error" | "success" | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [deletingImageId, setDeletingImageId] = useState<string | null>(null);
   const [creatingCategory, setCreatingCategory] = useState(false);
   const [manualOverrides, setManualOverrides] = useState({
     id: false,
@@ -93,6 +101,10 @@ export function ProductManager({
   const generatedCategoryId = useMemo(
     () => (generatedCategorySlug ? `cat-${generatedCategorySlug}` : ""),
     [generatedCategorySlug]
+  );
+  const selectedProductImages = useMemo(
+    () => products.find((product) => product.id === uploadProductId)?.images || [],
+    [products, uploadProductId]
   );
 
   const update = (key: keyof typeof form, value: string | string[]) => {
@@ -218,7 +230,8 @@ export function ProductManager({
         stock: payload.stock,
         is_active: true,
         categoryIds: payload.categoryIds,
-        categoryNames
+        categoryNames,
+        images: products.find((product) => product.id === payload.id)?.images || []
       };
 
       setProducts((current) => {
@@ -266,10 +279,59 @@ export function ProductManager({
       setStatus(response.ok ? `${data.count || files.length} image(s) uploaded.` : data.message || "Image upload failed.");
       setStatusTone(response.ok ? "success" : "error");
       if (response.ok) {
+        const uploadedImages =
+          (data.images as AdminProduct["images"] | undefined)?.map((image) => ({
+            id: image.id,
+            url: image.url,
+            alt: image.alt,
+            sortOrder: image.sortOrder
+          })) || [];
+
+        setProducts((current) =>
+          current.map((product) =>
+            product.id === uploadProductId
+              ? { ...product, images: [...product.images, ...uploadedImages].sort((a, b) => a.sortOrder - b.sortOrder) }
+              : product
+          )
+        );
         setFiles([]);
       }
     } finally {
       setUploading(false);
+    }
+  };
+
+  const deleteImage = async (imageId: string) => {
+    setDeletingImageId(imageId);
+    setStatus(null);
+    setStatusTone(null);
+
+    try {
+      const response = await fetch("/api/admin/products/images", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageId })
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setStatus(data.message || "Unable to delete image.");
+        setStatusTone("error");
+        return;
+      }
+
+      setProducts((current) =>
+        current.map((product) =>
+          product.id === uploadProductId
+            ? { ...product, images: product.images.filter((image) => image.id !== imageId) }
+            : product
+        )
+      );
+      setStatus("Image deleted.");
+      setStatusTone("success");
+    } finally {
+      setDeletingImageId(null);
     }
   };
 
@@ -582,7 +644,7 @@ export function ProductManager({
             <div>
               <p className="font-display text-3xl text-yisos-bone">Upload Product Image</p>
               <p className="mt-2 text-sm text-muted-foreground">
-                Save the product first, then upload one or more images to Supabase Storage.
+                Save the product first, then upload one or more images to Supabase Storage. Existing images can be removed below.
               </p>
             </div>
 
@@ -605,6 +667,52 @@ export function ProductManager({
             <Button variant="outline" onClick={uploadImage} disabled={uploading}>
               {uploading ? "Uploading..." : "Upload Image"}
             </Button>
+
+            <div className="space-y-3 border-t border-border/70 pt-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="font-display text-xl text-yisos-bone">Current Images</p>
+                  <p className="text-xs text-muted-foreground">
+                    {uploadProductId ? "These are the images currently attached to the selected product." : "Choose or edit a product to manage its images."}
+                  </p>
+                </div>
+              </div>
+
+              {selectedProductImages.length ? (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {selectedProductImages.map((image, index) => (
+                    <div key={image.id} className="overflow-hidden rounded-xl border border-border bg-black/20">
+                      <div className="relative aspect-[4/3]">
+                        <Image
+                          src={image.url}
+                          alt={image.alt || `${form.name || uploadProductId} image ${index + 1}`}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 320px"
+                        />
+                      </div>
+                      <div className="flex items-center justify-between gap-3 p-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm text-yisos-bone">Image {index + 1}</p>
+                          <p className="text-xs text-muted-foreground">Sort order: {image.sortOrder}</p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => deleteImage(image.id)}
+                          disabled={deletingImageId === image.id}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          {deletingImageId === image.id ? "Deleting..." : "Delete"}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No images are attached to this product yet.</p>
+              )}
+            </div>
           </div>
         </div>
       </div>
