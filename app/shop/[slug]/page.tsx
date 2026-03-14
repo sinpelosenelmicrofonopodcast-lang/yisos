@@ -58,9 +58,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     <>
       <ProductDetail product={product} reviews={reviews} />
 
-      <section className="mx-auto w-full max-w-7xl px-4 pb-20 md:px-8">
-        <h2 className="font-display text-4xl text-yisos-bone">Related Blends</h2>
-        <div className="mt-8 grid gap-5 md:grid-cols-3">
+      <section className="mx-auto w-full max-w-7xl px-4 pb-16 md:px-8 md:pb-20">
+        <h2 className="font-display text-3xl text-yisos-bone md:text-4xl">Related Blends</h2>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 md:mt-8 md:gap-5 xl:grid-cols-3">
           {relatedProducts.map((item) => (
             <ProductCard key={item.id} product={item} />
           ))}

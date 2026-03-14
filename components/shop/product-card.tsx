@@ -30,7 +30,7 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <Card className="surface-1 group overflow-hidden border-border/85 transition duration-500 hover:-translate-y-1 hover:border-yisos-gold/45">
-      <Link href={`/shop/${product.slug}`} className="relative block h-72 overflow-hidden">
+      <Link href={`/shop/${product.slug}`} className="relative block h-64 overflow-hidden md:h-72">
         {primaryImage ? (
           <Image
             src={primaryImage}
@@ -55,7 +55,7 @@ export function ProductCard({ product }: { product: Product }) {
           {primaryImage ? "Ember finish" : "Image pending"}
         </div>
       </Link>
-      <CardContent className="space-y-4 p-4">
+      <CardContent className="space-y-4 p-4 md:p-5">
         <div className="flex items-start justify-between gap-3">
           <div>
             <Link href={`/shop/${product.slug}`} className="font-display text-xl text-yisos-stitch hover:text-yisos-gold">
@@ -108,7 +108,7 @@ export function ProductCard({ product }: { product: Product }) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-end justify-between gap-3">
           <div>
             {product.salePrice ? (
               <div className="flex items-center gap-2">
@@ -119,7 +119,7 @@ export function ProductCard({ product }: { product: Product }) {
               <span className="text-lg font-semibold text-yisos-stitch">{formatCurrency(displayPrice)}</span>
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <QuickViewSheet product={product} />
             <AddToCartButton product={product} />
           </div>

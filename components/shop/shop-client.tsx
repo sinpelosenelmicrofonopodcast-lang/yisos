@@ -112,9 +112,9 @@ export function ShopClient({ products, categories }: ShopClientProps) {
   ]);
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 pb-20 pt-10 md:px-8">
-      <div className="surface-2 rounded-[24px] border border-yisos-gold/15 p-4">
-        <div className="grid gap-3 xl:grid-cols-[2fr,repeat(6,minmax(0,1fr))]">
+    <div className="mx-auto w-full max-w-7xl px-4 pb-16 pt-6 md:px-8 md:pb-20 md:pt-10">
+      <div className="surface-2 rounded-[24px] border border-yisos-gold/15 p-3 md:p-4">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-[2fr,repeat(6,minmax(0,1fr))]">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -183,16 +183,16 @@ export function ShopClient({ products, categories }: ShopClientProps) {
         </div>
       </div>
 
-      <div className="mt-6 flex items-center justify-between gap-4">
+      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 md:mt-6">
         <div className="text-sm text-yisos-bone/72">
           <span className="font-semibold text-yisos-stitch">{filteredProducts.length}</span> blends available
         </div>
-        <div className="text-[10px] uppercase tracking-[0.28em] text-yisos-gold">
+        <div className="text-[10px] uppercase tracking-[0.24em] text-yisos-gold md:tracking-[0.28em]">
           Strength filters / Pairing mood / Limited drops
         </div>
       </div>
 
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 md:mt-10 md:gap-5 xl:grid-cols-3">
         {filteredProducts.length ? (
           filteredProducts.map((product) => <ProductCard key={product.id} product={product} />)
         ) : (

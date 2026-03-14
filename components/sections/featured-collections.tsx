@@ -67,19 +67,23 @@ export function FeaturedCollections({ products }: { products: Product[] }) {
   });
 
   return (
-    <section className="mx-auto w-full max-w-7xl px-4 py-20 md:px-8">
+    <section className="mx-auto w-full max-w-7xl px-4 py-16 md:px-8 md:py-20">
       <SectionHeading
         eyebrow="Curated"
         title="Featured Collections"
         description="Each collection is built around mood, strength, and pairing - not shelf clutter."
       />
-      <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-12">
-        {collections.map((collection) => (
+      <div className="mt-8 grid gap-4 md:grid-cols-2 xl:mt-10 xl:grid-cols-12">
+        {collections.map((collection, index) => (
           <Link
             key={collection.title}
             href={collection.href}
             className={`group relative overflow-hidden rounded-[26px] border border-yisos-gold/15 ${
-              collection.title === "Lounge Favorites" ? "xl:col-span-5" : "xl:col-span-3"
+              collection.title === "Lounge Favorites"
+                ? "xl:col-span-5"
+                : collection.title === "Best Sellers"
+                  ? "md:col-span-2 xl:col-span-4"
+                  : "xl:col-span-3"
             }`}
           >
             {collection.image ? (
@@ -91,14 +95,24 @@ export function FeaturedCollections({ products }: { products: Product[] }) {
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(200,148,52,0.12),transparent_22%),linear-gradient(180deg,rgba(17,15,14,0.98),rgba(8,8,8,1))]" />
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-black/15" />
-            <div className="relative flex min-h-[280px] flex-col justify-end p-6">
-              <div className="text-[10px] uppercase tracking-[0.3em] text-yisos-gold">Collection</div>
-              <p className="mt-2 font-display text-3xl text-yisos-stitch">{collection.title}</p>
-              <p className="mt-3 max-w-sm text-sm leading-7 text-yisos-bone/78">{collection.description}</p>
+            <div
+              className={`relative flex flex-col justify-end p-5 md:p-6 ${
+                index === 0 ? "min-h-[320px] md:min-h-[360px]" : "min-h-[250px] md:min-h-[280px]"
+              }`}
+            >
+              <div className="text-[10px] uppercase tracking-[0.24em] text-yisos-gold">Collection</div>
+              <p className="mt-2 font-display text-[2rem] leading-[0.92] text-yisos-stitch md:text-3xl">
+                {collection.title}
+              </p>
+              <p className="mt-3 max-w-sm text-sm leading-6 text-yisos-bone/78 md:leading-7">
+                {collection.description}
+              </p>
               {collection.productName ? (
-                <p className="mt-4 text-xs uppercase tracking-[0.24em] text-yisos-bone/58">Current Highlight: {collection.productName}</p>
+                <p className="mt-4 text-[11px] uppercase tracking-[0.18em] text-yisos-bone/58 md:tracking-[0.24em]">
+                  Current Highlight: {collection.productName}
+                </p>
               ) : null}
-              <div className="mt-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-yisos-gold">
+              <div className="mt-4 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-yisos-gold md:text-xs md:tracking-[0.2em]">
                 Explore <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-1" />
               </div>
             </div>

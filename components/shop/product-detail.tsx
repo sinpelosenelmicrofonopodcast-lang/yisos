@@ -26,17 +26,17 @@ export function ProductDetail({ product, reviews }: ProductDetailProps) {
   }, [product.stock]);
 
   return (
-    <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 pb-20 pt-10 lg:grid-cols-[1.15fr,0.85fr] lg:px-8">
+    <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 pb-16 pt-6 lg:grid-cols-[1.15fr,0.85fr] lg:gap-10 lg:px-8 lg:pb-20 lg:pt-10">
       <div>
-        <div className="relative h-[470px] overflow-hidden rounded-2xl border border-border">
+        <div className="relative h-[360px] overflow-hidden rounded-2xl border border-border md:h-[470px]">
           <Image src={selectedImage} alt={product.name} fill className="object-cover" />
         </div>
-        <div className="mt-4 grid grid-cols-4 gap-3">
+        <div className="mt-3 grid grid-cols-4 gap-2 md:mt-4 md:gap-3">
           {product.images.map((image) => (
             <button
               key={image}
               onClick={() => setSelectedImage(image)}
-              className="relative h-24 overflow-hidden rounded-lg border border-border"
+              className="relative h-20 overflow-hidden rounded-lg border border-border md:h-24"
             >
               <Image src={image} alt={product.name} fill className="object-cover" />
             </button>
@@ -46,8 +46,8 @@ export function ProductDetail({ product, reviews }: ProductDetailProps) {
 
       <aside className="lg:sticky lg:top-28 lg:h-fit">
         <p className="text-xs uppercase tracking-[0.28em] text-yisos-gold">Premium Blend</p>
-        <h1 className="mt-3 font-display text-5xl text-yisos-bone">{product.name}</h1>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{product.description}</p>
+        <h1 className="mt-3 font-display text-4xl leading-[0.95] text-yisos-bone md:text-5xl">{product.name}</h1>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-[15px]">{product.description}</p>
 
         <div className="mt-4 flex flex-wrap gap-2">
           <Badge variant="gold">{product.strength}</Badge>
@@ -55,7 +55,7 @@ export function ProductDetail({ product, reviews }: ProductDetailProps) {
           <Badge variant="outline">Origin: {product.origin}</Badge>
         </div>
 
-        <div className="mt-6 rounded-xl border border-border bg-yisos-charcoal/70 p-5">
+        <div className="mt-5 rounded-xl border border-border bg-yisos-charcoal/70 p-4 md:mt-6 md:p-5">
           <div className="flex items-end justify-between">
             <div>
               {product.salePrice ? (
@@ -91,7 +91,7 @@ export function ProductDetail({ product, reviews }: ProductDetailProps) {
           </div>
         </div>
 
-        <Accordion type="single" collapsible className="mt-6 rounded-xl border border-border bg-yisos-charcoal/60 px-4">
+        <Accordion type="single" collapsible className="mt-5 rounded-xl border border-border bg-yisos-charcoal/60 px-4 md:mt-6">
           <AccordionItem value="notes">
             <AccordionTrigger>Tasting Notes</AccordionTrigger>
             <AccordionContent>{product.tastingNotes.join(", ")}</AccordionContent>
@@ -119,7 +119,7 @@ export function ProductDetail({ product, reviews }: ProductDetailProps) {
         </Accordion>
 
         {reviews.length ? (
-          <div className="mt-6 rounded-xl border border-border bg-yisos-charcoal/60 p-4">
+          <div className="mt-5 rounded-xl border border-border bg-yisos-charcoal/60 p-4 md:mt-6">
             <p className="font-display text-2xl text-yisos-bone">Reviews</p>
             <div className="mt-3 space-y-3">
               {reviews.slice(0, 3).map((review) => (

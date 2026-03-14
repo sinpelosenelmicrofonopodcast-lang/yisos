@@ -14,7 +14,7 @@ const smokeParticles = Array.from({ length: 10 }, (_, index) => ({
 
 export function HomeHero() {
   return (
-    <section className="relative min-h-[100vh] overflow-hidden">
+    <section className="relative min-h-[92svh] overflow-hidden">
       <div className="absolute inset-0 bg-[#050505]" />
       <div
         className="absolute inset-0 bg-cover bg-center"
@@ -53,7 +53,7 @@ export function HomeHero() {
         />
       ))}
 
-      <div className="relative mx-auto flex min-h-[100vh] w-full max-w-7xl items-center justify-center px-4 py-24 md:px-8">
+      <div className="relative mx-auto flex min-h-[92svh] w-full max-w-7xl items-center justify-center px-4 py-20 md:px-8 md:py-24">
         <motion.div
           initial={{ opacity: 0, y: 22 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -61,23 +61,23 @@ export function HomeHero() {
           transition={{ duration: 0.7 }}
           className="mx-auto max-w-[70rem] text-center"
         >
-          <p className="mb-6 text-[10px] uppercase tracking-[0.42em] text-yisos-gold/90 md:text-xs">
+          <p className="mb-5 text-[10px] uppercase tracking-[0.36em] text-yisos-gold/90 md:mb-6 md:text-xs">
             Private Reserve Collection
           </p>
-          <h1 className="text-balance font-display text-[3.35rem] leading-[0.95] tracking-[-0.03em] text-[#f5ead7] md:text-[5.1rem] xl:text-[6.6rem]">
+          <h1 className="text-balance font-display text-[2.85rem] leading-[0.94] tracking-[-0.03em] text-[#f5ead7] md:text-[5.1rem] xl:text-[6.6rem]">
             Premium Cigars.
             <br />
             Timeless Ritual.
           </h1>
-          <p className="mx-auto mt-8 max-w-5xl text-lg leading-relaxed text-[#f0e2cf]/88 md:text-[1.7rem]">
+          <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-[#f0e2cf]/88 md:mt-8 md:max-w-5xl md:text-[1.55rem]">
             Crafted for men of intent. Limited blends. Private drops. Lounge culture.
           </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-4 md:gap-6">
+          <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center md:mt-10 md:gap-6">
             <Button
               asChild
               variant="outline"
               size="lg"
-              className="min-w-[16rem] rounded-lg border-yisos-gold/75 bg-[linear-gradient(180deg,rgba(53,30,20,0.58),rgba(33,19,15,0.78))] px-10 font-display text-[1.75rem] font-medium text-[#f5ead7] shadow-[0_14px_40px_rgba(0,0,0,0.25)] hover:border-yisos-gold hover:bg-[linear-gradient(180deg,rgba(67,39,26,0.72),rgba(43,25,18,0.92))] md:min-w-[22rem]"
+              className="min-h-14 w-full rounded-lg border-yisos-gold/75 bg-[linear-gradient(180deg,rgba(53,30,20,0.58),rgba(33,19,15,0.78))] px-7 font-display text-[1.35rem] font-medium text-[#f5ead7] shadow-[0_14px_40px_rgba(0,0,0,0.25)] hover:border-yisos-gold hover:bg-[linear-gradient(180deg,rgba(67,39,26,0.72),rgba(43,25,18,0.92))] sm:min-w-[16rem] sm:w-auto md:min-h-16 md:min-w-[22rem] md:px-10 md:text-[1.75rem]"
             >
               <Link href="/shop">Shop Collection</Link>
             </Button>
@@ -85,7 +85,7 @@ export function HomeHero() {
               asChild
               variant="outline"
               size="lg"
-              className="min-w-[16rem] rounded-lg border-yisos-gold/75 bg-[linear-gradient(180deg,rgba(105,63,23,0.62),rgba(71,40,18,0.86))] px-10 font-display text-[1.75rem] font-medium text-[#f5ead7] shadow-[0_14px_40px_rgba(0,0,0,0.25)] hover:border-yisos-gold hover:bg-[linear-gradient(180deg,rgba(123,73,25,0.78),rgba(82,46,19,0.94))] md:min-w-[22rem]"
+              className="min-h-14 w-full rounded-lg border-yisos-gold/75 bg-[linear-gradient(180deg,rgba(105,63,23,0.62),rgba(71,40,18,0.86))] px-7 font-display text-[1.35rem] font-medium text-[#f5ead7] shadow-[0_14px_40px_rgba(0,0,0,0.25)] hover:border-yisos-gold hover:bg-[linear-gradient(180deg,rgba(123,73,25,0.78),rgba(82,46,19,0.94))] sm:min-w-[16rem] sm:w-auto md:min-h-16 md:min-w-[22rem] md:px-10 md:text-[1.75rem]"
             >
               <Link href="/membership">
                 <Crown className="mr-2 h-4 w-4" />
@@ -94,11 +94,11 @@ export function HomeHero() {
             </Button>
           </div>
 
-          <div className="mx-auto mt-10 flex max-w-3xl items-center justify-center gap-6 text-[11px] uppercase tracking-[0.28em] text-yisos-bone/58">
+          <div className="mx-auto mt-8 flex max-w-3xl flex-wrap items-center justify-center gap-3 text-[10px] uppercase tracking-[0.24em] text-yisos-bone/58 md:mt-10 md:gap-6 md:text-[11px] md:tracking-[0.28em]">
             <span>Whiskey Pairings</span>
-            <span className="h-px w-10 bg-yisos-gold/35" />
+            <span className="hidden h-px w-10 bg-yisos-gold/35 md:block" />
             <span>Limited Blends</span>
-            <span className="h-px w-10 bg-yisos-gold/35" />
+            <span className="hidden h-px w-10 bg-yisos-gold/35 md:block" />
             <span>Private Drops</span>
           </div>
 

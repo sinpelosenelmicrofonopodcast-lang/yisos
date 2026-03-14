@@ -42,6 +42,7 @@ export function CheckoutForm() {
   const shippingTotal = quote?.shippingAmount ?? summary.shipping;
   const handlingTotal = quote?.handlingAmount ?? 0;
   const estimatedTotalBeforeTax = discountedSubtotal + shippingTotal + handlingTotal;
+  const totalShippingCharge = shippingTotal + handlingTotal;
 
   const requestQuote = useCallback(async () => {
     if (!quoteReady) {
@@ -206,8 +207,8 @@ export function CheckoutForm() {
   };
 
   return (
-    <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 pb-20 pt-10 lg:grid-cols-[1fr,0.72fr] lg:px-8">
-      <section className="space-y-6 rounded-xl border border-border bg-yisos-charcoal/70 p-6">
+    <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 pb-16 pt-6 lg:grid-cols-[1fr,0.72fr] lg:gap-8 lg:px-8 lg:pb-20 lg:pt-10">
+      <section className="space-y-6 rounded-xl border border-border bg-yisos-charcoal/70 p-5 md:p-6">
         <div>
           <p className="text-xs uppercase tracking-[0.22em] text-yisos-gold">Secure Checkout</p>
           <h2 className="mt-2 font-display text-4xl text-yisos-bone">Shipping & Payment</h2>
@@ -309,48 +310,60 @@ export function CheckoutForm() {
         ) : null}
       </section>
 
-      <aside className="h-fit rounded-xl border border-border bg-yisos-charcoal/70 p-6 lg:sticky lg:top-28">
+      <aside className="h-fit rounded-xl border border-border bg-yisos-charcoal/70 p-5 md:p-6 lg:sticky lg:top-28">
         <h3 className="font-display text-3xl text-yisos-bone">Order Summary</h3>
-        <div className="mt-5 space-y-2 text-sm">
-          <div className="flex justify-between text-muted-foreground">
-            <span>Subtotal</span>
-            <span>{formatCurrency(summary.subtotal)}</span>
-          </div>
-          {summary.discount > 0 ? (
+        <div className="mt-5 rounded-2xl border border-border/70 bg-black/20 p-4">
+          <div className="space-y-3 text-sm">
             <div className="flex justify-between text-muted-foreground">
-              <span>Discount</span>
-              <span>-{formatCurrency(summary.discount)}</span>
+              <span>Merchandise</span>
+              <span>{formatCurrency(summary.subtotal)}</span>
             </div>
-          ) : null}
-          <div className="flex justify-between text-muted-foreground">
-            <span>USPS Shipping</span>
-            <span>
-              {quoteLoading ? (
-                <span className="inline-flex items-center gap-2">
-                  <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
-                  Calculating
-                </span>
-              ) : shippingTotal ? (
-                formatCurrency(shippingTotal)
-              ) : (
-                "Free"
-              )}
-            </span>
-          </div>
-          <div className="flex justify-between text-muted-foreground">
-            <span>Handling</span>
-            <span>{handlingTotal ? formatCurrency(handlingTotal) : "Included"}</span>
-          </div>
-          <div className="flex justify-between text-lg font-semibold text-yisos-bone">
-            <span>Estimated Total</span>
-            <span>{formatCurrency(estimatedTotalBeforeTax)}</span>
+            {summary.discount > 0 ? (
+              <div className="flex justify-between text-muted-foreground">
+                <span>Discount</span>
+                <span>-{formatCurrency(summary.discount)}</span>
+              </div>
+            ) : null}
+            <div className="flex justify-between text-muted-foreground">
+              <span>USPS Shipping</span>
+              <span>
+                {quoteLoading ? (
+                  <span className="inline-flex items-center gap-2">
+                    <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+                    Calculating
+                  </span>
+                ) : shippingTotal ? (
+                  formatCurrency(shippingTotal)
+                ) : (
+                  "Free"
+                )}
+              </span>
+            </div>
+            <div className="flex justify-between text-muted-foreground">
+              <span>Handling</span>
+              <span>{handlingTotal ? formatCurrency(handlingTotal) : "Included"}</span>
+            </div>
+            <div className="h-px bg-border/70" />
+            <div className="flex justify-between text-sm text-yisos-bone/76">
+              <span>Estimated tax</span>
+              <span>Calculated securely at payment</span>
+            </div>
+            <div className="flex justify-between text-lg font-semibold text-yisos-bone">
+              <span>Estimated Total</span>
+              <span>{formatCurrency(estimatedTotalBeforeTax)}</span>
+            </div>
           </div>
         </div>
 
         <div className="mt-4 rounded-lg border border-border/70 bg-black/20 p-4 text-sm text-muted-foreground">
           {quote ? (
             <>
-              <p className="font-medium text-yisos-bone">{quote.serviceName}</p>
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-medium text-yisos-bone">{quote.serviceName}</p>
+                <span className="rounded-full border border-yisos-gold/30 px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-yisos-gold">
+                  {quote.carrier}
+                </span>
+              </div>
               <p className="mt-1">
                 USPS validated to {quote.addressValidation?.address?.city}, {quote.addressValidation?.address?.state}{" "}
                 {quote.addressValidation?.address?.ZIPCode}
@@ -358,6 +371,9 @@ export function CheckoutForm() {
               </p>
               {quote.freeShippingApplied ? (
                 <p className="mt-2 text-yisos-gold">Free shipping threshold applied. Only handling is being charged.</p>
+              ) : null}
+              {!quote.freeShippingApplied ? (
+                <p className="mt-2 text-yisos-bone/70">Shipping and handling today: {formatCurrency(totalShippingCharge)}</p>
               ) : null}
             </>
           ) : (
