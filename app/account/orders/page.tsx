@@ -1,6 +1,9 @@
 import { requireUser } from "@/lib/services/auth-service";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface AccountOrder {
   id: string;
@@ -26,24 +29,42 @@ export default async function AccountOrdersPage() {
     : [];
 
   return (
-    <div className="rounded-xl border border-border bg-yisos-charcoal/70 p-6">
-      <h1 className="font-display text-4xl text-yisos-bone">Order History</h1>
-      <div className="mt-5 space-y-3">
+    <div className="space-y-5">
+      <div className="rounded-[1.5rem] border border-border bg-[linear-gradient(145deg,rgba(31,26,22,0.95),rgba(10,10,10,0.98))] p-6">
+        <p className="text-xs uppercase tracking-[0.24em] text-yisos-gold">Account</p>
+        <h1 className="mt-3 font-display text-4xl text-yisos-bone">Order History</h1>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          Review every order, confirm payment status, and keep track of what has shipped versus what is still being prepared.
+        </p>
+      </div>
+
+      <div className="space-y-3">
         {orders.length ? (
           (orders as AccountOrder[]).map((order) => (
-            <div key={order.id} className="rounded-lg border border-border bg-yisos-black/40 p-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="font-semibold text-yisos-bone">{order.order_number}</p>
-                <p className="text-sm text-muted-foreground">{formatDate(order.created_at)}</p>
+            <div key={order.id} className="rounded-[1.25rem] border border-border bg-yisos-charcoal/75 p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="font-display text-2xl text-yisos-bone">{order.order_number}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{formatDate(order.created_at)}</p>
+                </div>
+                <p className="text-xl font-semibold text-yisos-bone">{formatCurrency(Number(order.total || 0))}</p>
               </div>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {order.payment_status} • {order.fulfillment_status}
-              </p>
-              <p className="mt-2 text-lg font-semibold text-yisos-bone">{formatCurrency(Number(order.total || 0))}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Badge variant="gold">{order.payment_status.replace(/_/g, " ")}</Badge>
+                <Badge variant="outline">{order.fulfillment_status.replace(/_/g, " ")}</Badge>
+              </div>
             </div>
           ))
         ) : (
-          <p className="text-sm text-muted-foreground">No orders yet.</p>
+          <div className="rounded-[1.25rem] border border-border bg-yisos-charcoal/75 p-8">
+            <p className="font-display text-3xl text-yisos-bone">No orders yet.</p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Once you check out, your payments and shipping progress will appear here.
+            </p>
+            <Button asChild variant="luxury" className="mt-5">
+              <Link href="/shop">Shop The Collection</Link>
+            </Button>
+          </div>
         )}
       </div>
     </div>

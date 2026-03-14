@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "seed": "tsx scripts/seed.ts",
     "recover-carts": "tsx scripts/recover-abandoned-carts.ts",
-    "check:supabase": "tsx scripts/check-supabase.ts"
+    "check:supabase": "tsx scripts/check-supabase.ts",
+    "check:catalog": "tsx scripts/catalog-sanity-check.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

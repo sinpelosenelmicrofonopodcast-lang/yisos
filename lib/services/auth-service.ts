@@ -3,10 +3,14 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export interface UserProfile {
   id: string;
+  email: string | null;
   full_name: string | null;
   role: "customer" | "admin";
   membership_tier: string | null;
   marketing_opt_in: boolean;
+  order_updates_opt_in: boolean;
+  push_opt_in: boolean;
+  date_of_birth: string | null;
 }
 
 export async function getCurrentUser() {
@@ -38,7 +42,7 @@ export async function getUserProfile(userId: string) {
 
   const { data } = await supabase
     .from("profiles")
-    .select("id, full_name, role, membership_tier, marketing_opt_in")
+    .select("id, email, full_name, role, membership_tier, marketing_opt_in, order_updates_opt_in, push_opt_in, date_of_birth")
     .eq("id", userId)
     .maybeSingle();
 
