@@ -52,10 +52,10 @@ export default function AboutPage() {
         </div>
         <div className="relative h-[420px] overflow-hidden rounded-2xl border border-border">
           <Image
-            src="/lifestyle-lounge.jpg"
-            alt="YISOS lounge culture"
+            src="/about-owner.jpg"
+            alt="Jesus Soto holding a YISOS cigar"
             fill
-            className="object-cover"
+            className="object-cover object-top"
           />
         </div>
       </section>
