@@ -5,18 +5,18 @@ import { SectionHeading } from "@/components/sections/section-heading";
 const points = [
   {
     icon: Leaf,
-    title: "Crafted Like A Private Reserve",
-    body: "Every blend is selected for complexity, combustion, and finish. Nothing enters the collection unless it earns a longer evening."
+    title: "Built Around Real Lounge Ritual",
+    body: "This brand is not styled after lounge culture from a distance. It comes directly from nights built around cigars, conversation, card tables, and one more pour."
   },
   {
     icon: Shield,
-    title: "Precision In Every Touchpoint",
-    body: "From box construction to checkout pacing, YISOS is built with disciplined restraint, not smoke-shop excess."
+    title: "Veteran-Owned Discipline",
+    body: "YISOS carries the tone of a house built by a retired U.S. Army veteran: intentional, steady, and never casual about the details."
   },
   {
     icon: Trophy,
-    title: "A Lounge-Level Identity",
-    body: "The brand is built around ritual, conversation, whiskey, low light, and the feeling of stepping into a private club."
+    title: "Private-Club Familiarity",
+    body: "BYOB nights, personal lockers, premium blends, and a room that rewards regulars. The goal is to feel personal, not transactional."
   }
 ];
 
@@ -26,7 +26,7 @@ export function WhyYisos() {
       <SectionHeading
         eyebrow="Why YISOS"
         title="Built For Men Who Smoke With Intention"
-        description="We combine modern luxury with old-world cigar culture to create a premium ritual worth repeating."
+        description="Veteran-owned, lounge-shaped, and built to feel more like a private room than a retail counter."
       />
       <div className="mt-8">
         <VeteranOwnedBadge />
